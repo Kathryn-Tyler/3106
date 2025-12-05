@@ -41,3 +41,10 @@ Difficulty 3 | AI column 2 | Time 0.0280 | Nodes 206
 Difficulty 3 | AI column 6 | Time 0.0216 | Nodes 187
 Difficulty 3 | AI column 5 | Time 0.0129 | Nodes 58
 Difficulty 3 | AI column 2 | Time 0.0000 | Nodes 17
+Difficulty 1 | AI column 3 | Time 0.0000 | Nodes 8
+Difficulty 1 | AI column 4 | Time 0.0000 | Nodes 8
+Difficulty 1 | AI column 1 | Time 0.0000 | Nodes 8
+Difficulty 1 | AI column 3 | Time 0.0030 | Nodes 8
+Difficulty 1 | AI column 4 | Time 0.0022 | Nodes 7
+Difficulty 1 | AI column 3 | Time 0.0022 | Nodes 7
+Difficulty 1 | AI column 2 | Time 0.0000 | Nodes 7
