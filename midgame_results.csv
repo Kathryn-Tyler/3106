@@ -1,33 +1,33 @@
-position,matchup,start_player,winner,moves,avg_time_p1,avg_nodes_p1,avg_time_p2,avg_nodes_p2
-A_fork_X,Depth2_vs_Depth4,2,Draw,31,0.003475,19.7,0.051510,296.8
-A_fork_X,Depth2_vs_Depth4,1,P1,25,0.003887,22.6,0.068556,412.4
-A_fork_X,Depth4_vs_Depth2,2,Draw,31,0.078355,467.6,0.003809,22.6
-A_fork_X,Depth4_vs_Depth2,1,P1,29,0.069288,420.9,0.004455,25.7
-A_fork_X,Depth2_vs_Depth2,2,P1,28,0.003872,22.6,0.003834,22.6
-A_fork_X,Depth2_vs_Depth2,1,Draw,31,0.004011,23.2,0.003704,21.8
-A_fork_X,Depth4_vs_Depth4,2,P2,29,0.091813,565.1,0.080748,498.4
-A_fork_X,Depth4_vs_Depth4,1,P1,29,0.068673,420.0,0.061763,383.0
-B_diag_O,Depth2_vs_Depth4,1,P1,23,0.003185,19.2,0.033817,216.5
-B_diag_O,Depth2_vs_Depth4,2,Draw,29,0.002353,15.3,0.021492,137.6
-B_diag_O,Depth4_vs_Depth2,1,P1,21,0.050312,316.1,0.004489,26.4
-B_diag_O,Depth4_vs_Depth2,2,P1,26,0.040275,244.5,0.003802,21.8
-B_diag_O,Depth2_vs_Depth2,1,P1,21,0.003391,20.1,0.003658,22.1
-B_diag_O,Depth2_vs_Depth2,2,P1,26,0.003477,20.4,0.003624,21.8
-B_diag_O,Depth4_vs_Depth4,1,P1,23,0.049366,310.7,0.050576,323.6
-B_diag_O,Depth4_vs_Depth4,2,P2,29,0.025564,159.6,0.029128,180.1
-C_vertical,Depth2_vs_Depth4,2,P2,31,0.003498,20.7,0.051345,313.9
-C_vertical,Depth2_vs_Depth4,1,P1,31,0.003948,23.5,0.060530,376.8
-C_vertical,Depth4_vs_Depth2,2,Draw,32,0.067925,402.1,0.003268,20.5
-C_vertical,Depth4_vs_Depth2,1,Draw,32,0.062602,375.1,0.002882,17.4
-C_vertical,Depth2_vs_Depth2,2,Draw,32,0.004021,22.8,0.003762,22.5
-C_vertical,Depth2_vs_Depth2,1,P2,22,0.005557,33.3,0.005113,29.5
-C_vertical,Depth4_vs_Depth4,2,Draw,32,0.045400,279.0,0.050153,304.8
-C_vertical,Depth4_vs_Depth4,1,Draw,32,0.062556,375.1,0.048352,296.8
-D_balanced,Depth2_vs_Depth4,1,P1,11,0.005525,29.3,0.043819,258.0
-D_balanced,Depth2_vs_Depth4,2,P2,1,0.000000,0.0,0.029832,185.0
-D_balanced,Depth4_vs_Depth2,1,P1,11,0.052829,312.5,0.004298,26.4
-D_balanced,Depth4_vs_Depth2,2,P2,1,0.000000,0.0,0.003122,20.0
-D_balanced,Depth2_vs_Depth2,1,P1,27,0.003600,19.1,0.003258,18.4
-D_balanced,Depth2_vs_Depth2,2,P2,1,0.000000,0.0,0.003233,20.0
-D_balanced,Depth4_vs_Depth4,1,P1,11,0.052433,312.5,0.038343,244.4
-D_balanced,Depth4_vs_Depth4,2,P2,1,0.000000,0.0,0.029471,185.0
+Position,Matchup,Starting Player,Winner,Total Moves,Avg Time Player 1 (s),Avg Nodes Player 1,Avg Time Player 2 (s),Avg Nodes Player 2
+A_fork_X,Depth-2 vs Depth-4,Player 2 (Depth-4),Draw,31,0.0041233539581298825,19.733333333333334,0.05038970708847046,296.8125
+A_fork_X,Depth-2 vs Depth-4,Player 1 (Depth-2),Player 1 (Depth-2),25,0.003709921470055213,22.615384615384617,0.07143686215082805,412.4166666666667
+A_fork_X,Depth-4 vs Depth-2,Player 2 (Depth-2),Draw,31,0.0825670560201009,467.6,0.0029920339584350586,22.5625
+A_fork_X,Depth-4 vs Depth-2,Player 1 (Depth-4),Player 1 (Depth-4),29,0.06969968477884929,420.8666666666667,0.0037949085235595703,25.714285714285715
+A_fork_X,Depth-2 vs Depth-2,Player 2 (Depth-2),Player 1 (Depth-2),28,0.0025132724217006137,22.642857142857142,0.005904385021754673,22.642857142857142
+A_fork_X,Depth-2 vs Depth-2,Player 1 (Depth-2),Draw,31,0.003253042697906494,23.1875,0.004327472050984701,21.8
+A_fork_X,Depth-4 vs Depth-4,Player 2 (Depth-4),Player 2 (Depth-4),29,0.09340613228934151,565.1428571428571,0.08230438232421874,498.4
+A_fork_X,Depth-4 vs Depth-4,Player 1 (Depth-4),Player 1 (Depth-4),29,0.07053890228271484,420.0,0.06037720612117222,383.0
+B_diag_O,Depth-2 vs Depth-4,Player 1 (Depth-2),Player 1 (Depth-2),23,0.004396994908650716,19.166666666666668,0.032890948382290924,216.54545454545453
+B_diag_O,Depth-2 vs Depth-4,Player 2 (Depth-4),Draw,29,0.001496093613760812,15.285714285714286,0.022848733266194663,137.6
+B_diag_O,Depth-4 vs Depth-2,Player 1 (Depth-4),Player 1 (Depth-4),21,0.05166279185901989,316.09090909090907,0.0028263092041015624,26.4
+B_diag_O,Depth-4 vs Depth-2,Player 2 (Depth-2),Player 1 (Depth-4),26,0.04040958331181453,244.53846153846155,0.00401463875403771,21.846153846153847
+B_diag_O,Depth-2 vs Depth-2,Player 1 (Depth-2),Player 1 (Depth-2),21,0.003350344571200284,20.09090909090909,0.0040187835693359375,22.1
+B_diag_O,Depth-2 vs Depth-2,Player 2 (Depth-2),Player 1 (Depth-2),26,0.0027691217569204476,20.384615384615383,0.004004753552950346,21.76923076923077
+B_diag_O,Depth-4 vs Depth-4,Player 1 (Depth-4),Player 1 (Depth-4),23,0.05192136764526367,310.6666666666667,0.04758191108703613,323.6363636363636
+B_diag_O,Depth-4 vs Depth-4,Player 2 (Depth-4),Player 2 (Depth-4),29,0.024516735758100237,159.57142857142858,0.030120706558227538,180.13333333333333
+C_vertical,Depth-2 vs Depth-4,Player 2 (Depth-4),Player 2 (Depth-4),31,0.00710601806640625,20.666666666666668,0.048022881150245667,313.9375
+C_vertical,Depth-2 vs Depth-4,Player 1 (Depth-2),Player 1 (Depth-2),31,0.00407978892326355,23.5,0.06195014317830404,376.8
+C_vertical,Depth-4 vs Depth-2,Player 2 (Depth-2),Draw,32,0.06840386986732483,402.0625,0.003223121166229248,20.5
+C_vertical,Depth-4 vs Depth-2,Player 1 (Depth-4),Draw,32,0.06214040517807007,375.125,0.004244878888130188,17.375
+C_vertical,Depth-2 vs Depth-2,Player 2 (Depth-2),Draw,32,0.004873722791671753,22.8125,0.0031139403581619263,22.5
+C_vertical,Depth-2 vs Depth-2,Player 1 (Depth-2),Player 2 (Depth-2),22,0.005311294035478072,33.27272727272727,0.004982579838145863,29.545454545454547
+C_vertical,Depth-4 vs Depth-4,Player 2 (Depth-4),Draw,32,0.04623022675514221,279.0,0.05037766695022583,304.8125
+C_vertical,Depth-4 vs Depth-4,Player 1 (Depth-4),Draw,32,0.061673372983932495,375.125,0.04977402091026306,296.8125
+D_balanced,Depth-2 vs Depth-4,Player 1 (Depth-2),Player 1 (Depth-2),11,0.0035300652186075845,29.333333333333332,0.040497350692749026,258.0
+D_balanced,Depth-2 vs Depth-4,Player 2 (Depth-4),Player 2 (Depth-4),1,0,0,0.040194034576416016,185.0
+D_balanced,Depth-4 vs Depth-2,Player 1 (Depth-4),Player 1 (Depth-4),11,0.04940704504648844,312.5,0.0044119834899902345,26.4
+D_balanced,Depth-4 vs Depth-2,Player 2 (Depth-2),Player 2 (Depth-2),1,0,0,0.0,20.0
+D_balanced,Depth-2 vs Depth-2,Player 1 (Depth-2),Player 1 (Depth-2),27,0.0033550773348127094,19.142857142857142,0.0035335100614107572,18.384615384615383
+D_balanced,Depth-2 vs Depth-2,Player 2 (Depth-2),Player 2 (Depth-2),1,0,0,0.0033483505249023438,20.0
+D_balanced,Depth-4 vs Depth-4,Player 1 (Depth-4),Player 1 (Depth-4),11,0.04939723014831543,312.5,0.03746981620788574,244.4
+D_balanced,Depth-4 vs Depth-4,Player 2 (Depth-4),Player 2 (Depth-4),1,0,0,0.03735041618347168,185.0
