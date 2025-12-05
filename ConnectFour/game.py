@@ -73,7 +73,6 @@ def play_game():
 
             board.make_move(game_board, col, 2)
             print(f"AI chooses column {col}")
-            1
             
       
             print(f"AI time: {ai_time:.8f} sec")
