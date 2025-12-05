@@ -22,7 +22,7 @@ class ConnectFourGUI:
         # Difficulty selection
         self.difficulty_var = tk.IntVar(value=2)
         tk.Label(master, text="Difficulty:").pack()
-        tk.Radiobutton(master, text="Easy (Random)", variable=self.difficulty_var, value=1).pack()
+        tk.Radiobutton(master, text="Easy (Depth 1)", variable=self.difficulty_var, value=1).pack()
         tk.Radiobutton(master, text="Medium (Depth 2)", variable=self.difficulty_var, value=2).pack()
         tk.Radiobutton(master, text="Hard (Depth 4)", variable=self.difficulty_var, value=3).pack()
 

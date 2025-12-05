@@ -3,7 +3,7 @@
 
 # from board import create_board, print_board, make_move, check_win, check_draw, get_valid_moves
 import board
-from ai import pick_best_move, random_move
+from ai import pick_best_move
 
 def play_game():
     """Interactive Connect Four game between human (1) and AI (2)"""
@@ -13,7 +13,7 @@ def play_game():
 
     print("Welcome to Connect Four!")
     print("Choose difficulty:")
-    print("1 = Easy (random moves)")
+    print("1 = Easy (naive minimax depth 1)")
     print("2 = Medium (minimax depth 2)")
     print("3 = Hard (minimax depth 4)")
     
@@ -57,10 +57,10 @@ def play_game():
 
             # Difficulty-based decision-making
             if difficulty == 1:
-                  # EASY = random legal move
-                  col = random_move(game_board)
-                  ai_time = 0
-                  ai_nodes = 0
+                  # EASY = naive minimax, close to beginner level
+                  col, ai_time, ai_nodes = pick_best_move(game_board, 2, depth=1)
+                  #ai_time = 0
+                  #ai_nodes = 0
 
             elif difficulty == 2:
                   # MEDIUM = minimax depth 2
@@ -73,14 +73,15 @@ def play_game():
 
             board.make_move(game_board, col, 2)
             print(f"AI chooses column {col}")
+            1
             
-            if difficulty != 1:  # only for minimax AI
-                  print(f"AI time: {ai_time:.8f} sec")
-                  print(f"Nodes expanded: {ai_nodes}")
-                  
-             # Log AI performance to a file
-                  with open("ai_performance_log.txt", "a") as f:
-                        f.write(f"Difficulty {difficulty} | AI column {col} | Time {ai_time:.4f} | Nodes {ai_nodes}\n") 
+      
+            print(f"AI time: {ai_time:.8f} sec")
+            print(f"Nodes expanded: {ai_nodes}")
+            
+            # Log AI performance to a file
+            with open("ai_performance_log.txt", "a") as f:
+                  f.write(f"Difficulty {difficulty} | AI column {col} | Time {ai_time:.4f} | Nodes {ai_nodes}\n") 
 
             if board.check_win(game_board, 2):
                 board.print_pretty_board(game_board)

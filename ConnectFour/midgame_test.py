@@ -1,242 +1,7 @@
-'''# midgame_test.py
-# Clean deterministic evaluation of depth-2 vs depth-4 AIs
-# against fixed midgame positions.
-
-import csv
-import time
-from collections import Counter
-import matplotlib.pyplot as plt
-import pandas as pd
-
-from board import ROWS, COLS, create_board, make_move, get_valid_moves, check_win, check_draw
-from ai import pick_best_move
-
-# Since minimax is deterministic, repeating once is enough
-REPEATS = 1
-
-# -----------------------------
-# Test Positions
-# -----------------------------
-POSITIONS = [
-    {
-        "name": "A_fork_X",
-        "board": [
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,0,1,2,0,0],
-            [0,1,1,2,2,0,0],
-            [1,2,2,1,1,0,0]
-        ],
-        "next_to_move": 2
-    },
-    {
-        "name": "B_diag_O",
-        "board": [
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,1,0,0],
-            [0,0,2,1,2,0,0],
-            [0,1,2,2,1,0,0],
-            [1,2,1,1,2,0,0]
-        ],
-        "next_to_move": 1
-    },
-    {
-        "name": "C_vertical",
-        "board": [
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,2,1,0,0,0],
-            [0,0,1,2,2,0,0],
-            [1,1,2,1,1,0,0]
-        ],
-        "next_to_move": 2
-    },
-    {
-        "name": "D_balanced",
-        "board": [
-            [0,0,0,0,0,0,0],
-            [0,0,0,0,0,0,0],
-            [0,0,0,2,0,0,0],
-            [0,1,2,1,0,0,0],
-            [0,2,1,2,1,0,0],
-            [1,1,2,1,2,0,0]
-        ],
-        "next_to_move": 1
-    }
-]
-
-# Matchups: (P1_depth, P2_depth, Name)
-MATCHUPS = [
-    (2, 4, "Depth2_vs_Depth4"),
-    (4, 2, "Depth4_vs_Depth2"),
-    (2, 2, "Depth2_vs_Depth2"),
-    (4, 4, "Depth4_vs_Depth4"),
-]
-
-# ----------------------------------------
-# Play one full game from a given position
-# ----------------------------------------
-def play_from_position(start_board, start_player, p1_depth, p2_depth):
-    board = [row[:] for row in start_board]
-    current = start_player
-    times = {1: [], 2: []}
-    nodes = {1: [], 2: []}
-    move_count = 0
-
-    while True:
-        if check_win(board, 1) or check_win(board, 2) or check_draw(board):
-            break
-
-        depth = p1_depth if current == 1 else p2_depth
-        piece = current
-
-        # AI move
-        try:
-            move, t_taken, n_expanded = pick_best_move(board, piece, depth=depth)
-        except:
-            # Fallback if AI fails
-            move = None
-            t_taken = 0
-            n_expanded = 0
-
-        # Store analytics
-        times[current].append(t_taken)
-        nodes[current].append(n_expanded)
-
-        valid_moves = get_valid_moves(board)
-        if move not in valid_moves:
-            move = valid_moves[0]  # safe fallback
-
-        make_move(board, move, piece)
-        move_count += 1
-        current = 1 if current == 2 else 2
-
-    # winner
-    if check_win(board, 1):
-        return 1, move_count, times, nodes
-    elif check_win(board, 2):
-        return 2, move_count, times, nodes
-    else:
-        return 0, move_count, times, nodes
-
-
-# ----------------------------------------
-# Run all matchups and positions
-# ----------------------------------------
-def run_all_tests(out_csv="midgame_results.csv"):
-    rows = []
-    header = [
-        "position", "matchup", "start_player", "winner", "moves",
-        "avg_time_p1", "avg_nodes_p1", "avg_time_p2", "avg_nodes_p2"
-    ]
-
-    # Track wins across everything
-    overall = {"D2": 0, "D4": 0, "Draw": 0}
-
-    for pos in POSITIONS:
-        name = pos["name"]
-        board = pos["board"]
-
-        for p1_depth, p2_depth, label in MATCHUPS:
-            # Test both possible starting players
-            for start_player in (pos["next_to_move"], 1 if pos["next_to_move"] == 2 else 2):
-
-                winners = []
-                t1 = []
-                t2 = []
-                n1 = []
-                n2 = []
-
-                for _ in range(REPEATS):
-                    winner, moves, times, nodes = play_from_position(board, start_player, p1_depth, p2_depth)
-                    winners.append(winner)
-                    t1.extend(times[1])
-                    t2.extend(times[2])
-                    n1.extend(nodes[1])
-                    n2.extend(nodes[2])
-
-                # Pick the most common outcome
-                result = Counter(winners).most_common(1)[0][0]
-
-                if result == 1:
-                    winner_label = "P1"
-                    overall["D2" if p1_depth == 2 else "D4"] += 1
-                elif result == 2:
-                    winner_label = "P2"
-                    overall["D2" if p2_depth == 2 else "D4"] += 1
-                else:
-                    winner_label = "Draw"
-                    overall["Draw"] += 1
-
-                avg_t1 = sum(t1)/len(t1) if t1 else 0
-                avg_t2 = sum(t2)/len(t2) if t2 else 0
-                avg_n1 = sum(n1)/len(n1) if n1 else 0
-                avg_n2 = sum(n2)/len(n2) if n2 else 0
-
-                # Clean readable terminal output
-                print(f"\n[{name}]  {label} | Start: {start_player} | Winner: {winner_label}")
-                print(f"   Moves: {moves}")
-                print(f"   P1 avg time:  {avg_t1:.6f}  | P1 nodes: {avg_n1:.1f}")
-                print(f"   P2 avg time:  {avg_t2:.6f}  | P2 nodes: {avg_n2:.1f}")
-
-                rows.append([
-                    name, label, start_player, winner_label, moves,
-                    avg_t1, avg_n1, avg_t2, avg_n2
-                ])
-
-    # Write CSV
-    with open(out_csv, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-        writer.writerows(rows)
-
-    print("\nSaved CSV:", out_csv)
-
-    # Final strength summary
-    print("\n===== FINAL PERFORMANCE SUMMARY =====")
-    print(f"Depth-2 wins: {overall['D2']}")
-    print(f"Depth-4 wins: {overall['D4']}")
-    print(f"Draws:        {overall['Draw']}")
-
-    if overall["D4"] > overall["D2"]:
-        print("Conclusion: Depth-4 is stronger overall.")
-    elif overall["D2"] > overall["D4"]:
-        print("Conclusion: Depth-2 surprisingly performed better.")
-    else:
-        print("Conclusion: They performed equally.")
-
-    generate_plot(out_csv)
-
-
-# ----------------------------------------
-# Plot results
-# ----------------------------------------
-def generate_plot(csv_path):
-    df = pd.read_csv(csv_path)
-
-    plt.figure(figsize=(9,6))
-
-    for label, group in df.groupby("matchup"):
-        plt.plot(group["moves"], group["avg_nodes_p1"], marker="o", label=label)
-
-    plt.title("Nodes Expanded (Player 1) by Matchup")
-    plt.xlabel("Moves in Game")
-    plt.ylabel("Avg Nodes Expanded")
-    plt.legend()
-    plt.tight_layout()
-    plt.savefig("midgame_performance.png")
-    print("Saved plot: midgame_performance.png")
-
-
-if __name__ == "__main__":
-    run_all_tests()
-'''
 # midgame_test.py
-# Clean deterministic evaluation of depth-2 vs depth-4 AIs
-# against fixed midgame positions.
+# Evaluation of Depth-1 (easy) AI against Depth-2 and Depth-4
+# Includes graphical analysis of win rates and move times
+# Added terminal logging for live progress and final summary
 
 import csv
 from collections import Counter
@@ -246,13 +11,10 @@ import pandas as pd
 from board import ROWS, COLS, create_board, make_move, get_valid_moves, check_win, check_draw
 from ai import pick_best_move
 
-# Number of repeats for each test
-REPEATS = 1
+REPEATS = 20  # number of games per position/matchup
 
-# -----------------------------
-# Test Positions
-# -----------------------------
 POSITIONS = [
+    # Midgame fork scenario for X
     {
         "name": "A_fork_X",
         "board": [
@@ -265,6 +27,7 @@ POSITIONS = [
         ],
         "next_to_move": 2
     },
+    # Midgame diagonal potential for O
     {
         "name": "B_diag_O",
         "board": [
@@ -277,6 +40,7 @@ POSITIONS = [
         ],
         "next_to_move": 1
     },
+    # Midgame vertical threat
     {
         "name": "C_vertical",
         "board": [
@@ -289,6 +53,7 @@ POSITIONS = [
         ],
         "next_to_move": 2
     },
+    # Midgame balanced board, no immediate wins
     {
         "name": "D_balanced",
         "board": [
@@ -300,21 +65,47 @@ POSITIONS = [
             [1,1,2,1,2,0,0]
         ],
         "next_to_move": 1
+    },
+    # Empty starting board
+    {
+        "name": "E_empty_start",
+        "board": [
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0],
+            [0,0,0,0,0,0,0]
+        ],
+        "next_to_move": 1
+    },
+    # Nearly full board, testing draw scenarios
+    {
+        "name": "F_nearly_full",
+        "board": [
+            [1,2,1,2,1,2,1],
+            [2,1,2,1,2,1,2],
+            [1,2,1,2,1,2,1],
+            [2,1,2,1,2,1,2],
+            [1,2,1,2,1,2,1],
+            [2,1,2,1,2,1,0]
+        ],
+        "next_to_move": 2
     }
 ]
 
-# Matchups: (P1_depth, P2_depth, Name)
+# Matchups include Depth-1 comparisons
 MATCHUPS = [
+    (1, 2, "Depth-1 vs Depth-2"),
+    (1, 4, "Depth-1 vs Depth-4"),
     (2, 4, "Depth-2 vs Depth-4"),
-    (4, 2, "Depth-4 vs Depth-2"),
+    (1, 1, "Depth-1 vs Depth-1"),
     (2, 2, "Depth-2 vs Depth-2"),
     (4, 4, "Depth-4 vs Depth-4"),
 ]
 
-# ----------------------------------------
-# Play one full game from a given position
-# ----------------------------------------
 def play_from_position(start_board, start_player, p1_depth, p2_depth):
+    """Plays a full game from a starting position."""
     board = [row[:] for row in start_board]
     current = start_player
     times = {1: [], 2: []}
@@ -353,9 +144,24 @@ def play_from_position(start_board, start_player, p1_depth, p2_depth):
     else:
         return 0, move_count, times, nodes
 
-# ----------------------------------------
-# Run all matchups and positions
-# ----------------------------------------
+def log_game_progress(pos_name, matchup_label, start_player, game_num, total_games, winner_label, moves, depth1_summary=None):
+    """Prints live progress of each game to the terminal."""
+    print(f"\nPosition: {pos_name} | Matchup: {matchup_label} | Starting Player: {start_player}")
+    print(f"  Game {game_num}/{total_games} finished. Winner: {winner_label}. Moves: {moves}")
+    
+    # Optional Depth-1 summary after each game
+    if depth1_summary:
+        d1_stats = ", ".join([f"{k}: {v['wins']}W/{v['losses']}L/{v['draws']}D" for k,v in depth1_summary.items()])
+        print(f"  Depth-1 cumulative: {d1_stats}")
+
+def print_depth1_summary(summary):
+    """Prints a final cumulative Depth-1 summary in the terminal."""
+    print("\n===== FINAL DEPTH-1 SUMMARY =====")
+    for matchup, stats in summary.items():
+        total_games = stats['wins'] + stats['losses'] + stats['draws']
+        avg_time = sum(stats['times'])/len(stats['times']) if stats['times'] else 0
+        print(f"{matchup}: {stats['wins']}W / {stats['losses']}L / {stats['draws']}D | Total Games: {total_games} | Avg Move Time: {avg_time:.3f}s")
+
 def run_all_tests(out_csv="midgame_results.csv"):
     rows = []
     header = [
@@ -364,19 +170,21 @@ def run_all_tests(out_csv="midgame_results.csv"):
         "Avg Time Player 2 (s)", "Avg Nodes Player 2"
     ]
 
-    overall = {"Depth-2": 0, "Depth-4": 0, "Draw": 0}
+    # Overall tracking
+    depth1_summary = {
+        "D1_vs_D2": {"wins":0, "losses":0, "draws":0, "times":[]},
+        "D1_vs_D4": {"wins":0, "losses":0, "draws":0, "times":[]}
+    }
 
     for pos in POSITIONS:
         name = pos["name"]
         board = pos["board"]
 
         for p1_depth, p2_depth, label in MATCHUPS:
-
             for start_player in (pos["next_to_move"], 3 - pos["next_to_move"]):
-
                 t1, t2, n1, n2, winners = [], [], [], [], []
 
-                for _ in range(REPEATS):
+                for game_num in range(REPEATS):
                     winner, moves, times, nodes = play_from_position(board, start_player, p1_depth, p2_depth)
                     winners.append(winner)
                     t1.extend(times[1])
@@ -384,72 +192,103 @@ def run_all_tests(out_csv="midgame_results.csv"):
                     n1.extend(nodes[1])
                     n2.extend(nodes[2])
 
-                result = Counter(winners).most_common(1)[0][0]
+                    result = Counter(winners).most_common(1)[0][0]
+                    winner_label = "Draw" if result==0 else f"Player {result} (Depth-{p1_depth if result==1 else p2_depth})"
 
-                if result == 1:
-                    winner_label = f"Player 1 (Depth-{p1_depth})"
-                    overall[f"Depth-{p1_depth}"] += 1
-                elif result == 2:
-                    winner_label = f"Player 2 (Depth-{p2_depth})"
-                    overall[f"Depth-{p2_depth}"] += 1
-                else:
-                    winner_label = "Draw"
-                    overall["Draw"] += 1
+                    # Log progress
+                    log_game_progress(
+                        pos_name=name,
+                        matchup_label=label,
+                        start_player=start_player,
+                        game_num=game_num+1,
+                        total_games=REPEATS,
+                        winner_label=winner_label,
+                        moves=moves,
+                        depth1_summary=depth1_summary
+                    )
+
+                # Depth-1 comparisons
+                if (p1_depth == 1 and p2_depth == 2) or (p1_depth == 2 and p2_depth == 1):
+                    depth1_times = t1 if p1_depth==1 else t2
+                    depth1_summary["D1_vs_D2"]["times"].extend(depth1_times)
+                    if (result == 1 and p1_depth==1) or (result==2 and p2_depth==1):
+                        depth1_summary["D1_vs_D2"]["wins"] += 1
+                    elif result == 0:
+                        depth1_summary["D1_vs_D2"]["draws"] += 1
+                    else:
+                        depth1_summary["D1_vs_D2"]["losses"] += 1
+
+                if (p1_depth == 1 and p2_depth == 4) or (p1_depth == 4 and p2_depth == 1):
+                    depth1_times = t1 if p1_depth==1 else t2
+                    depth1_summary["D1_vs_D4"]["times"].extend(depth1_times)
+                    if (result == 1 and p1_depth==1) or (result==2 and p2_depth==1):
+                        depth1_summary["D1_vs_D4"]["wins"] += 1
+                    elif result == 0:
+                        depth1_summary["D1_vs_D4"]["draws"] += 1
+                    else:
+                        depth1_summary["D1_vs_D4"]["losses"] += 1
 
                 avg_t1 = sum(t1)/len(t1) if t1 else 0
                 avg_t2 = sum(t2)/len(t2) if t2 else 0
                 avg_n1 = sum(n1)/len(n1) if n1 else 0
                 avg_n2 = sum(n2)/len(n2) if n2 else 0
 
-                start_label = f"Player {start_player} (Depth-{p1_depth if start_player == 1 else p2_depth})"
-
-                print(f"\nPosition: {name}")
-                print(f"Matchup: {label}")
-                print(f"Starting Player: {start_label}")
-                print(f"Winner: {winner_label}")
-                print(f"Total Moves: {moves}")
-                print(f"Player 1 -> Avg Time: {avg_t1:.6f}s | Avg Nodes: {avg_n1:.1f}")
-                print(f"Player 2 -> Avg Time: {avg_t2:.6f}s | Avg Nodes: {avg_n2:.1f}")
+                start_label = f"Player {start_player} (Depth-{p1_depth if start_player==1 else p2_depth})"
 
                 rows.append([
-                    name, label, start_label, winner_label, moves,
+                    name, label, start_label, winner_label, sum([len(t1),len(t2)]),
                     avg_t1, avg_n1, avg_t2, avg_n2
                 ])
 
-    # Write CSV
-    with open(out_csv, "w", newline="") as f:
-        writer = csv.writer(f)
-        writer.writerow(header)
-        writer.writerows(rows)
+    # Save CSV
+    df = pd.DataFrame(rows, columns=header)
+    df.to_csv(out_csv, index=False)
+    print(f"\nResults saved to {out_csv}")
 
-    print("\nSaved CSV:", out_csv)
+    # Print final cumulative Depth-1 summary
+    print_depth1_summary(depth1_summary)
+    
+    # ===== PLOTS =====
+    plot_depth1_winrates(depth1_summary)
+    plot_depth1_times(depth1_summary)
 
-    print("\n===== FINAL PERFORMANCE SUMMARY =====")
-    print(f"Depth-2 wins: {overall['Depth-2']}")
-    print(f"Depth-4 wins: {overall['Depth-4']}")
-    print(f"Draws:        {overall['Draw']}")
 
-    if overall["Depth-4"] > overall["Depth-2"]:
-        print("Conclusion: Depth-4 is stronger overall.")
-    elif overall["Depth-2"] > overall["Depth-4"]:
-        print("Conclusion: Depth-2 performed better.")
-    else:
-        print("Conclusion: Both depths performed equally.")
+def plot_depth1_winrates(summary):
+    """Bar chart: Depth-1 wins/losses/draws vs Depth-2 and Depth-4"""
+    import matplotlib.pyplot as plt
+    import numpy as np
 
-    generate_plot(out_csv)
+    categories = ["D1_vs_D2", "D1_vs_D4"]
+    wins = [summary[c]["wins"] for c in categories]
+    losses = [summary[c]["losses"] for c in categories]
+    draws = [summary[c]["draws"] for c in categories]
 
-# ----------------------------------------
-# Plot results (interactive)
-# ----------------------------------------
-def generate_plot(csv_path):
-    df = pd.read_csv(csv_path)
-    plt.figure(figsize=(9,6))
-    for label, group in df.groupby("Matchup"):
-        plt.plot(group["Total Moves"], group["Avg Nodes Player 1"], marker="o", label=label)
-    plt.title("Nodes Expanded by Player 1 per Matchup")
-    plt.xlabel("Moves in Game")
-    plt.ylabel("Average Nodes Expanded (Player 1)")
+    x = np.arange(len(categories))
+    width = 0.3
+
+    plt.figure(figsize=(8,5))
+    plt.bar(x - width, wins, width, label="Wins", color="green")
+    plt.bar(x, draws, width, label="Draws", color="gray")
+    plt.bar(x + width, losses, width, label="Losses", color="red")
+    plt.xticks(x, ["Depth-1 vs Depth-2", "Depth-1 vs Depth-4"])
+    plt.ylabel("Number of Games")
+    plt.title("Depth-1 Win/Loss/Draw Performance")
     plt.legend()
+    plt.tight_layout()
+    plt.show()
+
+def plot_depth1_times(summary):
+    """Bar chart: average move time per turn for Depth-1 vs Depth-2/Depth-4"""
+    import matplotlib.pyplot as plt
+    import numpy as np
+
+    categories = ["D1_vs_D2", "D1_vs_D4"]
+    avg_times = [sum(summary[c]["times"])/len(summary[c]["times"]) if summary[c]["times"] else 0 for c in categories]
+
+    plt.figure(figsize=(6,4))
+    plt.bar(["Depth-1 vs Depth-2", "Depth-1 vs Depth-4"], avg_times, color="blue")
+    plt.ylabel("Average Move Time (s)")
+    plt.title("Depth-1 Average Move Time Comparison")
     plt.tight_layout()
     plt.show()
 
