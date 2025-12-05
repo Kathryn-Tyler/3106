@@ -75,8 +75,8 @@ def play_game():
             print(f"AI chooses column {col}")
             
             if difficulty != 1:  # only for minimax AI
-                  print(f"⏱ AI time: {ai_time:.8f} sec")
-                  print(f"🧩 Nodes expanded: {ai_nodes}")
+                  print(f"AI time: {ai_time:.8f} sec")
+                  print(f"Nodes expanded: {ai_nodes}")
                   
              # Log AI performance to a file
                   with open("ai_performance_log.txt", "a") as f:
